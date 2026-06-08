@@ -100,3 +100,13 @@ GitHub is used for version control, documentation, and project backup.
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+### Content Notice
+
+This repository contains both source code and personal reading content.
+
+The MIT License applies only to the website's source code, including HTML, CSS, JavaScript, and other technical assets created for this project.
+
+Book titles, cover images, quotations, summaries, reviews, and other literary content remain the property of their respective authors, publishers, or copyright holders and are included for personal, educational, or archival purposes only.
+
+This project claims no ownership of third-party literary works.
