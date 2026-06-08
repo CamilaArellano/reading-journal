@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>reading journal</title>
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* Layout: dos columnas iguales */
+.home-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1.5rem 2.5rem;
+}
+
+/* Título */
+.big-title {
+  font-family: var(--font-hand);
+  font-size: 3rem;
+  line-height: 1.05;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+/* Estampitas: siempre en fila horizontal de 4 */
+.stamps-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.stamp {
+  aspect-ratio: 0.8;
+  border: 2px solid rgba(129,53,38,0.35);
+  border-radius: 2px;
+  background: rgba(255,255,255,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 1px 2px 5px rgba(129,53,38,0.12);
+}
+.stamp::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1.5px dashed rgba(129,53,38,0.18);
+  pointer-events: none;
+}
+.stamp img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Bloque derecho: "content" + tickets */
+.content-label {
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Tarjeta diary */
+.diary-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(129,53,38,0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 11px;
+  font-family: var(--font-hand);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+/* Intro */
+.intro-text {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--text-light);
+  line-height: 1.8;
+}
+
+/* Stickers */
+.stickers-block {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 0.25rem;
+}
+
+.sticker-img {
+  width: 64px; height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.12));
+  transition: transform 0.2s;
+  display: block;
+}
+.sticker-img:nth-child(odd)  { transform: rotate(-5deg); }
+.sticker-img:nth-child(even) { transform: rotate(4deg); }
+.sticker-img:hover { transform: scale(1.18) rotate(0deg) !important; }
+
+/* placeholder emoji */
+.sticker-e {
+  font-size: 2rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.09));
+}
+.sticker-e:nth-child(odd)  { transform: rotate(-5deg); }
+.sticker-e:nth-child(even) { transform: rotate(4deg); }
+.sticker-e:hover { transform: scale(1.18) rotate(0deg) !important; }
+
+@media (max-width: 560px) {
+  .home-layout { grid-template-columns: 1fr; }
+  .big-title { font-size: 2.2rem; }
+  .stamps-row { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="notebook">
+    <div class="home-layout">
+
+      <!-- COL 1: título + estampitas -->
+      <div>
+        <div class="big-title">reading<br>journal</div>
+        <div class="stamps-row">
+          <div class="stamp"><img src="stickers/flor.png" alt="flor"></div>
+          <div class="stamp"><img src="stickers/mariposa.png" alt="mariposa"></div>
+          <div class="stamp"><img src="stickers/durazno.png" alt="durazno"></div>
+          <div class="stamp"><img src="stickers/hojas.png" alt="hojas"></div>
+          
+        </div>
+      </div>
+
+      <!-- COL 2: content + 2×2 tickets -->
+      <div>
+        <span class="content-label">content</span>
+        <div class="tickets-grid">
+          <a href="my-books.html"  class="ticket-btn">my books</a>
+          <a href="quotes.html"    class="ticket-btn">quotes</a>
+          <a href="favorites.html" class="ticket-btn">favorites</a>
+          <a href="index.html"     class="ticket-btn">home</a>
+        </div>
+        <div class="diary-card">~ 🌷 a personal reading diary 🌷 ~</div>
+        <div class="diary-card">~ Español-English ~</div>
+      </div>
+
+      <!-- FILA 2 COL 1: intro -->
+      <div>
+        <p class="intro-text">
+          hello my name is Camila and this is my personal reading
+          journal where I'll be sharing my opinions and reviews about
+          the books I read.
+        </p>
+        <br>
+        <p class="intro-text">Hope you enjoy &lt;3</p>
+      </div>
+
+      <!-- FILA 2 COL 2: stickers PNG -->
+      <div class="stickers-block">
+        <img src="stickers/corazon.png" class="sticker-img" alt="corazon">
+        <img src="stickers/gato.png" class="sticker-img" alt="gato">
+        <img src="stickers/conejo.png" class="sticker-img" alt="conejo">
+        <img src="stickers/libros.png" class="sticker-img" alt="libros">
+        <img src="stickers/cafe.png" class="sticker-img" alt="cafe">
+        <img src="stickers/flores.png" class="sticker-img" alt="flores">
+        <img src="stickers/catarina.png" class="sticker-img" alt="catarina">
+        <img src="stickers/cisnes.png" class="sticker-img" alt="cisnes">
+        <img src="stickers/sol.png" class="sticker-img" alt="sol">
+        <img src="stickers/arbol.png" class="sticker-img" alt="arbol">
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="sidebar">
+    <a href="my-books.html"  class="tab-btn"><span>my books</span></a>
+    <a href="quotes.html"    class="tab-btn"><span>quotes</span></a>
+    <a href="favorites.html" class="tab-btn"><span>favorites</span></a>
+    <a href="index.html"     class="tab-btn active"><span>home</span></a>
+  </nav>
+</div>
+</body>
+</html>
