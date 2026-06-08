@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>my books — reading journal</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="favicon.png">
+<style>
+.books-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.side-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-hand);
+  font-size: 1.6rem;
+  color: var(--text-light);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 0.5rem;
+  user-select: none;
+}
+
+.books-content { flex: 1; min-width: 0; }
+
+/* Section row: label + grid split by dashed line (matches mockup) */
+.section-block {
+  margin-bottom: 0.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.section-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+/* Main content area split into two halves by a dashed vertical rule */
+.books-main {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0 12px;
+  border: 1px solid rgba(129,53,38,0.12);
+  padding: 12px;
+  background: rgba(255,255,255,0.3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+.books-half { min-width: 0; }
+
+.divider-v {
+  background: rgba(129,53,38,0.12);
+  border-radius: 1px;
+}
+
+/* Grid of book cards within each half */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 12px 8px;
+}
+
+/* Section label above grid */
+.half-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(129,53,38,0.12);
+}
+.stat-pill {
+  background: rgba(232,180,188,0.2);
+  border: 1px solid rgba(241,198,217,0.5);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-light);
+}
+.stat-num {
+  font-weight: bold;
+  color: var(--tab-active);
+  margin-right: 4px;
+}
+
+@media (max-width: 560px) {
+  .books-main { grid-template-columns: 1fr; }
+  .divider-v { display: none; }
+  .side-title { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="notebook">
+    <div class="books-layout">
+
+      <div class="side-title">my books</div>
+
+      <div class="books-content">
+
+        <!-- Stats -->
+        <div class="stats-bar" id="stats-bar"></div>
+
+        <!-- Main split: finished | reading+tbr -->
+        <div class="books-main">
+
+          <!-- LEFT HALF: finished -->
+          <div class="books-half">
+            <div class="half-label">finished</div>
+            <div class="books-grid" id="grid-finished"></div>
+          </div>
+
+          <div class="divider-v"></div>
+
+          <!-- RIGHT HALF: reading + TBR -->
+          <div class="books-half">
+            <div class="half-label">reading</div>
+            <div class="books-grid" id="grid-reading"></div>
+            <div class="half-label" style="margin-top:14px">to be read</div>
+            <div class="books-grid" id="grid-tbr"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar">
+    <a href="my-books.html"  class="tab-btn active"><span>My Books</span></a>
+    <a href="quotes.html"    class="tab-btn"><span>Quotes</span></a>
+    <a href="favorites.html" class="tab-btn"><span>Favorites</span></a>
+    <a href="index.html"     class="tab-btn"><span>Home</span></a>
+  </nav>
+</div>
+
+<script src="js/books.js"></script>
+<script>
+function fillGrid(containerId, books, showStars = true) {
+  const container = document.getElementById(containerId);
+  if (!books.length) {
+    container.innerHTML = `<p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);grid-column:1/-1">— empty —</p>`;
+    return;
+  }
+  books.forEach(book => {
+    const a = document.createElement('a');
+    a.href = `book-review.html?id=${book.id}`;
+    a.className = 'book-card';
+    a.title = `${book.title} — ${book.author}`;
+
+    const coverHtml = book.cover
+      ? `<img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.parentElement.innerHTML='<span style=font-size:1.8rem>📖</span>'">`
+      : `<span style="font-size:1.8rem">📖</span>`;
+
+    a.innerHTML = `
+      <div class="card-cover">${coverHtml}</div>
+      ${showStars && book.rating > 0 ? `<div class="card-stars">${renderStars(book.rating)}</div>` : ''}
+    `;
+    container.appendChild(a);
+  });
+}
+
+function buildStats() {
+  const finished = getBooksByStatus('finished');
+  const reading  = getBooksByStatus('reading');
+  const tbr      = getBooksByStatus('tbr');
+  const pages    = finished.reduce((s, b) => s + (b.pages || 0), 0);
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-pill"><span class="stat-num">${finished.length}</span>finished</div>
+    <div class="stat-pill"><span class="stat-num">${reading.length}</span>reading</div>
+    <div class="stat-pill"><span class="stat-num">${tbr.length}</span>tbr</div>
+    <div class="stat-pill"><span class="stat-num">${pages.toLocaleString()}</span>pages read</div>
+  `;
+}
+
+buildStats();
+fillGrid('grid-finished', getBooksByStatus('finished'));
+fillGrid('grid-reading',  getBooksByStatus('reading'), false);
+fillGrid('grid-tbr',      getBooksByStatus('tbr'), false);
+</script>
+</body>
+</html>
