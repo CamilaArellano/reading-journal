@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>monthly favorites — reading journal</title>
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.fav-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Rotated side title */
+.side-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-hand);
+  font-size: 1.6rem;
+  color: var(--text-light);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 0.5rem;
+  user-select: none;
+}
+
+.months-wrap { flex: 1; min-width: 0; }
+
+/* Row of months — 3 per row as in mockup */
+.months-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-bottom: 1px;
+}
+
+.month-cell {
+  border: 1px solid rgba(129,53,38,0.12);
+  padding: 10px 8px 8px;
+  background: rgba(255,255,255,0.35);
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.month-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: lowercase;
+  align-self: flex-start;
+  letter-spacing: 0.04em;
+}
+
+/* Empty month placeholder — matches mockup wireframe style */
+.empty-book {
+  width: 72px;
+  height: 98px;
+  border: 1.5px solid rgba(129,53,38,0.12);
+  border-radius: 2px;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.empty-book::before {
+  content: '';
+  position: absolute;
+  left: 6px; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(129,53,38,0.12);
+}
+
+/* Book inside cell: smaller */
+.month-cell .card-cover {
+  width: 72px;
+  height: 98px;
+}
+.month-cell .meta-tag {
+  font-size: 9.5px;
+}
+.month-cell .star {
+  font-size: 12px;
+}
+
+/* Year selector */
+.year-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.year-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border: 1px solid rgba(129,53,38,0.25);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.5);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.year-btn:hover { background: rgba(129,53,38,0.08); color: var(--text); }
+.year-btn.active {
+  background: var(--text);
+  color: var(--sheet);
+  border-color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .months-row { grid-template-columns: repeat(2, 1fr); }
+  .side-title { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="notebook">
+    <div class="fav-layout">
+
+      <!-- Rotated left label -->
+      <div class="side-title">monthly favorites</div>
+
+      <div class="months-wrap">
+        <!-- Year selector -->
+        <div id="year-selector" class="year-selector"></div>
+        <!-- Months grid -->
+        <div id="months-container"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="sidebar">
+    <a href="my-books.html"  class="tab-btn"><span>My Books</span></a>
+    <a href="quotes.html"    class="tab-btn"><span>Quotes</span></a>
+    <a href="favorites.html" class="tab-btn active"><span>Favorites</span></a>
+    <a href="index.html"     class="tab-btn"><span>Home</span></a>
+  </nav>
+</div>
+
+<script src="js/books.js"></script>
+<script>
+const MONTHS = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+
+// Get all years that have finished books
+function getAvailableYears() {
+  const years = new Set();
+  BOOKS.forEach(b => {
+    if (b.status === 'finished' && b.finishedDate) {
+      const y = parseInt(b.finishedDate.split('-')[0]);
+      if (!isNaN(y)) years.add(y);
+    }
+  });
+  return [...years].sort((a, b) => b - a); // newest first
+}
+
+// Get finished books for a specific month AND year
+function getBooksByMonthYear(month, year) {
+  return BOOKS.filter(b => {
+    if (b.status !== 'finished' || !b.finishedDate) return false;
+    const parts = b.finishedDate.split('-');
+    return parseInt(parts[0]) === year && parseInt(parts[1]) === month;
+  });
+}
+
+function buildFavoritesGrid(year) {
+  const container = document.getElementById('months-container');
+  container.innerHTML = '';
+
+  // Two rows: 1-6, 7-12
+  [0, 6].forEach(offset => {
+    const row = document.createElement('div');
+    row.className = 'months-row';
+
+    for (let i = offset; i < offset + 6; i++) {
+      const monthNum = i + 1;
+      // Prefer favorites, fallback to highest-rated book of that month
+      const monthBooks = getBooksByMonthYear(monthNum, year);
+      const book = monthBooks.find(b => b.favorite) || monthBooks.sort((a,b) => b.rating - a.rating)[0];
+
+      const cell = document.createElement('div');
+      cell.className = 'month-cell';
+
+      if (book) {
+        const coverHtml = book.cover
+          ? `<img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.style.display='none'">`
+          : `<span style="font-size:1.5rem">📖</span>`;
+
+        cell.innerHTML = `
+          <span class="month-name">${MONTHS[i]}</span>
+          <a href="book-review.html?id=${book.id}" class="book-card" style="align-items:center;gap:5px">
+            <div class="card-cover">${coverHtml}</div>
+            <div class="card-stars">${renderStars(book.rating)}</div>
+            <div class="card-meta">
+              <span class="meta-tag">Genre: ${book.genre}</span>
+              <span class="meta-tag">Format: ${book.format}</span>
+            </div>
+          </a>`;
+      } else {
+        cell.innerHTML = `
+          <span class="month-name">${MONTHS[i]}</span>
+          <div class="empty-book"></div>`;
+      }
+
+      row.appendChild(cell);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+function buildYearSelector(years, currentYear) {
+  const wrap = document.getElementById('year-selector');
+  wrap.innerHTML = years.map(y => `
+    <button
+      class="year-btn ${y === currentYear ? 'active' : ''}"
+      onclick="switchYear(${y})">${y}</button>
+  `).join('');
+}
+
+function switchYear(year) {
+  document.querySelectorAll('.year-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent) === year);
+  });
+  buildFavoritesGrid(year);
+}
+
+// Init
+const years = getAvailableYears();
+const currentYear = new Date().getFullYear();
+const defaultYear = years.includes(currentYear) ? currentYear : years[0];
+
+buildYearSelector(years, defaultYear);
+buildFavoritesGrid(defaultYear);
+</script>
+</body>
+</html>
