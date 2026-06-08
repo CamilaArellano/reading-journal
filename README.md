@@ -90,13 +90,6 @@ https://readingtimecam.neocities.org/
 
 GitHub is used for version control, documentation, and project backup.
 
-## Future Improvements
-
-* Additional reading statistics
-* Search and filtering options
-* Enhanced challenge tracking
-* Improved mobile experience
-
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
